@@ -13,9 +13,10 @@ helpers do
 end
 
 get '/:host' do |host|
+	format = params[:format] || 'msgpack'
 	raw = true if params.include?('raw')
 	raw = false if params.include?('noraw')
-	case params[:format]
+	case format
 	when 'json'
 		require 'json'
 		content_type :json, 'charset' => 'utf-8'
@@ -23,6 +24,10 @@ get '/:host' do |host|
 	when 'marshal'
 		content_type 'application/x-marshal'
 		Marshal.dump(resolve(host, raw.nil? ? true : raw))
+	when 'msgpack'
+		require 'msgpack'
+		content_type 'application/x-msgpack'
+		MessagePack.dump(resolve(host, raw.nil? ? true : raw))
 	when 'yaml'
 		require 'yaml'
 		content_type :yaml
@@ -31,9 +36,5 @@ get '/:host' do |host|
 		require 'ox'
 		content_type :xml
 		Ox.dump(resolve(host))
-	else
-		require 'msgpack'
-		content_type 'application/x-msgpack'
-		MessagePack.dump(resolve(host, raw.nil? ? true : raw))
 	end
 end
