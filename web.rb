@@ -7,7 +7,7 @@ helpers do
 	def resolve(host, raw = false)
 		dns = Resolv::DNS.new(nameserver: %w(87.118.111.215 80.79.54.55 8.8.8.8 8.8.4.4))
 		[Resolv::DNS::Resource::IN::AAAA, Resolv::DNS::Resource::IN::A].flat_map do |klass|
-			dns.getresources(host, klass).collect {|r| [r.ttl, raw ? r.address.address : r.address.to_s]}
+			dns.getresources(host, klass).collect {|r| [r.ttl, raw ? r.address.address.force_encoding(Encoding::UTF_8) : r.address.to_s]}
 		end
 	end
 end
@@ -20,7 +20,7 @@ get '/:host' do |host|
 	when 'json'
 		require 'json'
 		content_type :json, 'charset' => 'utf-8'
-		JSON.dump(resolve(host))
+		resolve(host, raw.nil? ? false : raw).to_json
 	when 'marshal'
 		content_type 'application/x-marshal'
 		Marshal.dump(resolve(host, raw.nil? ? true : raw))
