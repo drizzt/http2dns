@@ -5,7 +5,7 @@ require 'resolv'
 
 helpers do
 	def resolve(host, raw = false)
-		dns = Resolv::DNS.new(nameserver: %w(8.8.8.8 8.8.4.4))
+		dns = Resolv::DNS.new(nameserver: %w(87.118.111.215 80.79.54.55 8.8.8.8 8.8.4.4))
 		[Resolv::DNS::Resource::IN::AAAA, Resolv::DNS::Resource::IN::A].flat_map do |klass|
 			dns.getresources(host, klass).collect {|r| [r.ttl, raw ? r.address.address : r.address.to_s]}
 		end
